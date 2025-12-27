@@ -1,9 +1,232 @@
 <!DOCTYPE html>
-<html>
-<!-- meta http-equiv="refresh" content="0;url=https://sites.google.com/view/pumila/home" -->
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
-<p><a href="https://sites.google.com/com2us.com/pumila-home?pli=1&authuser=1">My Home</a></p>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sogwon CHOE</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter (Clean Sans-serif) & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #ffffff;
+            color: #111111;
+        }
+        
+        /* Minimal Toast */
+        #toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 12px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* QR Code Container Animation */
+        #qr-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+        }
+        #qr-container.open {
+            max-height: 300px; /* Adjust based on QR size */
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
+
+    <main class="w-full max-w-sm">
+        
+        <!-- Header Section -->
+        <header class="mb-10">
+            <!-- CHOE is sized smaller (text-2xl) relative to the name (text-4xl) -->
+            <h1 class="text-4xl font-extrabold tracking-tight text-black mb-2">
+                Sogwon <span class="text-2xl font-bold">CHOE</span>
+            </h1>
+            <p class="text-lg text-gray-500 font-medium">
+                CEO & Head of Technology
+            </p>
+            <p class="text-sm text-gray-400 mt-1">
+                Com2uS Platform
+            </p>
+        </header>
+
+        <!-- Divider -->
+        <div class="w-12 h-0.5 bg-black mb-10"></div>
+
+        <!-- Contact Info Section -->
+        <div class="space-y-6 text-sm">
+            
+            <!-- Mobile -->
+            <div class="group cursor-pointer" onclick="copyToClipboard('+82 10-2761-8236')">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Mobile</p>
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2 group-hover:border-gray-900 transition-colors">
+                    <span class="font-medium text-gray-900">+82 10-2761-8236</span>
+                    <span class="text-xs text-gray-300 group-hover:text-black transition-colors">Copy</span>
+                </div>
+            </div>
+
+            <!-- Office -->
+            <div class="group cursor-pointer" onclick="copyToClipboard('+82 2-9292-6100')">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Office</p>
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2 group-hover:border-gray-900 transition-colors">
+                    <span class="font-medium text-gray-900">+82 2-9292-6100</span>
+                    <span class="text-xs text-gray-300 group-hover:text-black transition-colors">Copy</span>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="group cursor-pointer" onclick="copyToClipboard('pumila@com2us.com')">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Email</p>
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2 group-hover:border-gray-900 transition-colors">
+                    <span class="font-medium text-gray-900">pumila@com2us.com</span>
+                    <span class="text-xs text-gray-300 group-hover:text-black transition-colors">Copy</span>
+                </div>
+            </div>
+
+            <!-- Website -->
+            <div>
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Website</p>
+                <a href="https://hiveplatform.ai" target="_blank" class="flex items-center justify-between border-b border-gray-100 pb-2 hover:border-gray-900 transition-colors">
+                    <span class="font-medium text-gray-900">hiveplatform.ai</span>
+                    <span class="text-xs text-gray-300">↗</span>
+                </a>
+            </div>
+
+            <!-- Address -->
+            <div>
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Address</p>
+                <div class="border-b border-gray-100 pb-2">
+                    <span class="font-medium text-gray-900 block leading-relaxed">
+                        18F, Building C, BYC Highcity, 131 Gasan digital 1-ro, Geumcheon-gu, Seoul 08506, South Korea
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-12 space-y-4">
+            <button onclick="downloadVCard()" class="w-full py-4 border border-black hover:bg-black hover:text-white transition-colors text-sm font-semibold tracking-wide uppercase">
+                Save Contact
+            </button>
+            
+            <button onclick="toggleQR()" class="w-full text-center text-xs text-gray-400 hover:text-black transition-colors uppercase tracking-widest">
+                Show QR Code
+            </button>
+        </div>
+
+        <!-- QR Code Section (Hidden by default) -->
+        <div id="qr-container" class="mt-4 flex flex-col items-center justify-center">
+            <div class="p-4 bg-white border border-gray-100 shadow-sm rounded-lg">
+                <div id="qrcode"></div>
+            </div>
+            <p class="text-[10px] text-gray-400 mt-2 uppercase tracking-wider">Scan to share</p>
+        </div>
+
+        <!-- Private Page Link (Added) -->
+        <div class="mt-10 mb-4 text-center">
+            <a href="https://sites.google.com/com2us.com/pumila-home/" target="_blank" class="text-[10px] text-gray-300 hover:text-gray-500 transition-colors uppercase tracking-widest border-b border-transparent hover:border-gray-300 pb-0.5">
+                Private page
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Simple Toast -->
+    <div id="toast">Copied to clipboard</div>
+
+    <script>
+        // 1. Generate QR Code on Load
+        window.onload = function() {
+            // QR Code for the page URL
+            new QRCode(document.getElementById("qrcode"), {
+                text: "https://sogwon.github.io",
+                width: 128,
+                height: 128,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        };
+
+        // 2. Toggle QR Visibility
+        function toggleQR() {
+            const container = document.getElementById('qr-container');
+            const btn = document.querySelector('button[onclick="toggleQR()"]');
+            
+            if (container.classList.contains('open')) {
+                container.classList.remove('open');
+                btn.innerText = "Show QR Code";
+            } else {
+                container.classList.add('open');
+                btn.innerText = "Hide QR Code";
+            }
+        }
+
+        // 3. Copy Function
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('Copied');
+        }
+
+        // 4. Toast Function
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+        }
+
+        // 5. Download vCard
+        function downloadVCard() {
+            const vCardData = `BEGIN:VCARD
+VERSION:3.0
+N:CHOE;Sogwon;;;
+FN:Sogwon CHOE
+ORG:Com2uS Platform;
+TITLE:CEO & Head of Technology
+TEL;type=CELL;type=VOICE;type=pref:+82 10-2761-8236
+TEL;type=WORK;type=VOICE:+82 2-9292-6100
+EMAIL;type=INTERNET;type=WORK:pumila@com2us.com
+URL:https://hiveplatform.ai
+ADR;type=WORK:;;18F, Building C, BYC Highcity, 131 Gasan digital 1-ro;Geumcheon-gu;Seoul;08506;South Korea
+END:VCARD`;
+
+            const blob = new Blob([vCardData], { type: "text/vcard" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "Sogwon_CHOE.vcf";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </body>
 </html>
