@@ -3,123 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sogwon CHOE - Profile</title>
+    <title>Sogwon</title>
     <style>
-        /* 기본 설정 */
+        /* Minimalist Design System 
+           - Font: System fonts for clean rendering
+           - Colors: Monochrome (Black/Gray/White)
+        */
         :root {
             --bg-color: #ffffff;
-            --text-main: #111111;
-            --text-sub: #555555;
-            --text-light: #888888;
+            --text-primary: #111111;
+            --text-secondary: #555555;
+            --text-tertiary: #999999;
+            --link-color: #333333;
+            --accent-color: #0077b5; /* LinkedIn Blue for hover state */
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            /* 세로 중앙 정렬 대신 상단 정렬로 변경하여 위치 조정 */
+            align-items: flex-start; 
             min-height: 100vh;
-            margin: 0;
-            text-align: center;
-            line-height: 1.6;
+            /* 상단 여백: 기존 중앙 정렬 대비 위로 올림 (약 80~100px 정도의 시각적 여백) */
+            padding-top: 100px;
         }
 
         .container {
-            padding: 2rem;
-            max-width: 400px;
             width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            /* 좌측 정렬 적용 */
+            text-align: left;
+            box-sizing: border-box;
         }
 
-        /* 이름 섹션 */
+        /* --- Typography --- */
+
         h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin: 0 0 0.5rem 0;
             letter-spacing: -0.5px;
+            line-height: 1.2;
         }
 
-        /* 성(Last Name) 스타일링: Small Caps 적용 */
+        /* 성(Last Name) 스타일링: Small Caps */
+        /* 'Choe'라고 입력하면 'C'는 대문자, 'hoe'는 소문자 높이의 대문자로 표시됨 */
         .surname {
             font-variant: small-caps; 
-            /* 영문 소문자를 입력해도 작은 대문자로 표시됩니다 */
         }
 
-        /* 직함 및 회사 */
         .title {
             font-size: 1.1rem;
-            color: var(--text-sub);
+            color: var(--text-secondary);
             font-weight: 400;
             margin: 0;
+            line-height: 1.5;
         }
 
         .company {
             font-size: 1.1rem;
             font-weight: 600;
-            margin: 0 0 2.5rem 0;
-            color: var(--text-main);
+            color: var(--text-primary);
+            margin: 0 0 1.5rem 0; /* 간격 살짝 조정 */
+            line-height: 1.5;
         }
 
-        /* QR 코드 영역 */
-        .qr-wrapper {
-            margin: 2rem 0;
+        /* --- Links --- */
+
+        a {
+            text-decoration: none;
+            transition: color 0.2s ease, border-color 0.2s ease;
         }
+
+        /* General Text Link Styling (Hive SDK, LinkedIn) */
+        .text-link {
+            display: block; /* 줄바꿈 */
+            font-size: 0.9rem;
+            color: var(--link-color);
+            margin-bottom: 0.8rem;
+            width: fit-content;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 2px;
+            word-break: break-all;
+        }
+
+        .text-link:hover {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+
+        /* Label styling for links (optional, simply bolding the prefix if needed, but keeping minimal here) */
         
-        .qr-code {
-            width: 150px;
-            height: 150px;
-            /* QR코드 이미지 렌더링 선명하게 */
-            image-rendering: pixelated; 
+        /* --- QR Code --- */
+        
+        .qr-wrapper {
+            margin-top: 2.5rem;
+            margin-bottom: 3rem;
         }
 
-        /* 하단 링크 섹션 */
+        .qr-code {
+            width: 140px;
+            height: 140px;
+            /* 이미지가 흐릿해지지 않도록 픽셀 렌더링 처리 */
+            image-rendering: pixelated; 
+            display: block;
+        }
+
+        /* --- Footer (Private Homepage) --- */
+
         .footer {
-            margin-top: 3rem;
-            font-size: 0.8rem;
-            color: var(--text-light);
-            border-top: 1px solid #eee;
+            border-top: 1px solid #f0f0f0;
             padding-top: 1.5rem;
         }
 
-        .footer p {
-            margin: 0 0 5px 0;
+        .footer-link {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.7rem;
+            letter-spacing: 1.2px;
+            font-weight: 500;
         }
 
-        .footer a {
-            color: var(--text-light);
-            text-decoration: none;
-            word-break: break-all; /* 긴 URL 줄바꿈 처리 */
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: var(--text-main);
+        .footer-link:hover {
+            color: var(--text-primary);
             text-decoration: underline;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+            body {
+                padding-top: 60px; /* 모바일에서는 상단 여백을 조금 줄임 */
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
 
     <main class="container">
+        <!-- 이름 영역: Choe에 small-caps 적용 -->
         <h1>Sogwon <span class="surname">Choe</span></h1>
         
+        <!-- 직함 및 회사 영역 -->
         <p class="title">CEO & Head of Technology</p>
         <p class="company">Com2uS Platform</p>
 
+        <!-- Hive SDK 링크 추가 -->
+        <a href="https://hiveplatform.ai/" target="_blank" class="text-link">
+            https://hiveplatform.ai/
+        </a>
+
+        <!-- LinkedIn 텍스트 링크 -->
+        <a href="https://www.linkedin.com/in/sogwon/" target="_blank" class="text-link">
+            https://www.linkedin.com/in/sogwon/
+        </a>
+
+        <!-- QR Code 영역 -->
+        <!-- API를 사용하여 sogwon.github.io 링크에 대한 QR코드를 실시간 생성 -->
         <div class="qr-wrapper">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://kr.linkedin.com/in/sogwon&color=000000&bgcolor=ffffff" 
-                 alt="LinkedIn QR Code" 
-                 class="qr-code">
+            <a href="https://sogwon.github.io/" target="_blank" title="Go to Github Page">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://sogwon.github.io/&color=000000&bgcolor=ffffff&margin=0" 
+                     alt="QR Code for https://sogwon.github.io/" 
+                     class="qr-code">
+            </a>
         </div>
 
+        <!-- 하단 Private Homepage 링크 (URL 숨김) -->
         <div class="footer">
-            <p>Private homepage</p>
-            <a href="https://sites.google.com/com2us.com/pumila-home/" target="_blank">
-                https://sites.google.com/com2us.com/pumila-home/
+            <a href="https://sites.google.com/com2us.com/pumila-home/" target="_blank" class="footer-link">
+                Private Page
             </a>
         </div>
     </main>
