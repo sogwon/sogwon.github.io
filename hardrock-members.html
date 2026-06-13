@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>연락처 목록</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --danger: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: -0.03em;
+    }
+    .desc { margin: 0; color: var(--muted); }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    select, input {
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0 12px;
+      background: #fff;
+      font-size: 14px;
+    }
+    .card {
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      word-break: keep-all;
+    }
+    th {
+      background: #f9fafb;
+      color: #374151;
+      font-size: 13px;
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    tbody tr:hover { background: #fafafa; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .name { font-weight: 700; }
+    .business { line-height: 1.5; }
+    .contact-cell { width: 130px; text-align: right; }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 13px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { background: var(--accent-dark); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .contact-box {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-size: 13px;
+      line-height: 1.6;
+      text-align: left;
+      word-break: break-all;
+    }
+    .status {
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .error { color: var(--danger); }
+    dialog {
+      width: min(420px, calc(100% - 32px));
+      border: 0;
+      border-radius: 18px;
+      padding: 0;
+      box-shadow: 0 24px 80px rgba(0,0,0,.24);
+    }
+    dialog::backdrop { background: rgba(15, 23, 42, .45); }
+    .modal { padding: 24px; }
+    .modal h2 { margin: 0 0 8px; font-size: 20px; }
+    .modal p { margin: 0 0 16px; color: var(--muted); line-height: 1.5; }
+    .modal input { width: 100%; margin-bottom: 12px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .secondary { background: #e5e7eb; color: #111827; }
+    .secondary:hover { background: #d1d5db; }
+    @media (max-width: 780px) {
+      header { display: block; }
+      .toolbar { margin-top: 18px; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tbody tr { padding: 12px 0; border-bottom: 1px solid var(--line); }
+      tbody tr:last-child { border-bottom: 0; }
+      td { border: 0; padding: 8px 16px; }
+      td::before {
+        display: block;
+        margin-bottom: 4px;
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .contact-cell { width: auto; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>연락처 목록</h1>
+        <p class="desc">이름, 직함, 소속, 주요 사업을 기준으로 정렬할 수 있습니다.</p>
+      </div>
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="검색어 입력">
+        <select id="sortSelect" aria-label="정렬 기준">
+          <option value="name">이름순</option>
+          <option value="title">직함순</option>
+          <option value="organization">소속순</option>
+          <option value="business">주요 사업순</option>
+        </select>
+        <select id="directionSelect" aria-label="정렬 방향">
+          <option value="asc">오름차순</option>
+          <option value="desc">내림차순</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="card">
+      <div id="status" class="status">데이터를 불러오는 중입니다.</div>
+      <table id="listTable" hidden>
+        <thead>
+          <tr>
+            <th data-sort="name">이름</th>
+            <th data-sort="title">직함</th>
+            <th data-sort="organization">소속</th>
+            <th data-sort="business">주요 사업</th>
+            <th class="contact-cell">연락처</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <dialog id="emailDialog">
+    <form method="dialog" class="modal" id="emailForm">
+      <h2>열람자 이메일 확인</h2>
+      <p>연락처를 열람하려면 이메일 주소를 입력해 주세요. 정상적인 이메일 형식일 때만 전화번호와 이메일 주소가 표시됩니다.</p>
+      <input id="viewerEmail" type="email" placeholder="name@example.com" required>
+      <div id="modalError" class="error" role="alert"></div>
+      <div class="modal-actions">
+        <button class="secondary" value="cancel" type="button" id="cancelBtn">취소</button>
+        <button value="confirm" type="submit">확인</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const state = {
+      rows: [],
+      sortKey: 'name',
+      direction: 'asc',
+      pendingRowId: null,
+      pendingButton: null
+    };
+
+    const $ = selector => document.querySelector(selector);
+    const tbody = $('#tbody');
+    const statusEl = $('#status');
+    const tableEl = $('#listTable');
+    const dialog = $('#emailDialog');
+    const emailInput = $('#viewerEmail');
+    const modalError = $('#modalError');
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[ch]));
+    }
+
+    function normalize(value) {
+      return String(value || '').trim().toLocaleLowerCase('ko-KR');
+    }
+
+    function sortRows(rows) {
+      const direction = state.direction === 'asc' ? 1 : -1;
+      return [...rows].sort((a, b) => normalize(a[state.sortKey]).localeCompare(normalize(b[state.sortKey]), 'ko-KR') * direction);
+    }
+
+    function getFilteredRows() {
+      const q = normalize($('#searchInput').value);
+      if (!q) return state.rows;
+      return state.rows.filter(row => ['name', 'title', 'organization', 'business'].some(key => normalize(row[key]).includes(q)));
+    }
+
+    function render() {
+      const rows = sortRows(getFilteredRows());
+      if (!rows.length) {
+        tableEl.hidden = true;
+        statusEl.hidden = false;
+        statusEl.textContent = '표시할 데이터가 없습니다.';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(row => `
+        <tr data-row-id="${escapeHtml(row.id)}">
+          <td data-label="이름" class="name">${escapeHtml(row.name)}</td>
+          <td data-label="직함">${escapeHtml(row.title)}</td>
+          <td data-label="소속">${escapeHtml(row.organization)}</td>
+          <td data-label="주요 사업" class="business">${escapeHtml(row.business)}</td>
+          <td data-label="연락처" class="contact-cell">
+            <button type="button" data-contact-id="${escapeHtml(row.id)}">연락처</button>
+            <div class="contact-box" id="contact-${escapeHtml(row.id)}"></div>
+          </td>
+        </tr>
+      `).join('');
+
+      statusEl.hidden = true;
+      tableEl.hidden = false;
+    }
+
+    function showError(message) {
+      tableEl.hidden = true;
+      statusEl.hidden = false;
+      statusEl.classList.add('error');
+      statusEl.textContent = message;
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+    }
+
+    function openEmailDialog(rowId, button) {
+      state.pendingRowId = rowId;
+      state.pendingButton = button;
+      modalError.textContent = '';
+      emailInput.value = '';
+      dialog.showModal();
+      setTimeout(() => emailInput.focus(), 50);
+    }
+
+    function revealContact(rowId, contact) {
+      const box = document.getElementById(`contact-${rowId}`);
+      const phone = contact.phone || '전화번호 없음';
+      const email = contact.email || '이메일 없음';
+      box.innerHTML = `<strong>전화번호</strong>: ${escapeHtml(phone)}<br><strong>이메일</strong>: ${escapeHtml(email)}`;
+      box.style.display = 'block';
+    }
+
+    document.addEventListener('click', event => {
+      const btn = event.target.closest('[data-contact-id]');
+      if (!btn) return;
+      openEmailDialog(btn.dataset.contactId, btn);
+    });
+
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (state.sortKey === key) {
+          state.direction = state.direction === 'asc' ? 'desc' : 'asc';
+          $('#directionSelect').value = state.direction;
+        } else {
+          state.sortKey = key;
+          $('#sortSelect').value = key;
+        }
+        render();
+      });
+    });
+
+    $('#sortSelect').addEventListener('change', event => {
+      state.sortKey = event.target.value;
+      render();
+    });
+    $('#directionSelect').addEventListener('change', event => {
+      state.direction = event.target.value;
+      render();
+    });
+    $('#searchInput').addEventListener('input', render);
+    $('#cancelBtn').addEventListener('click', () => dialog.close());
+
+    $('#emailForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const viewerEmail = emailInput.value.trim();
+      if (!isValidEmail(viewerEmail)) {
+        modalError.textContent = '정상적인 이메일 주소를 입력해 주세요.';
+        return;
+      }
+      modalError.textContent = '';
+      const button = state.pendingButton;
+      if (button) button.disabled = true;
+
+      google.script.run
+        .withSuccessHandler(contact => {
+          revealContact(state.pendingRowId, contact);
+          if (button) button.disabled = false;
+          dialog.close();
+        })
+        .withFailureHandler(error => {
+          modalError.textContent = error.message || '연락처를 불러오지 못했습니다.';
+          if (button) button.disabled = false;
+        })
+        .getContact(state.pendingRowId, viewerEmail);
+    });
+
+    google.script.run
+      .withSuccessHandler(rows => {
+        state.rows = rows || [];
+        render();
+      })
+      .withFailureHandler(error => showError(error.message || '데이터를 불러오지 못했습니다.'))
+      .getPublicRows();
+  </script>
+</body>
+</html>
